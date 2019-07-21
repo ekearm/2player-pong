@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Pong</title>
+	<style>
+		* { padding: 0; margin: 0; }
+		canvas {background: #000; display: block; margin: 0 auto; }
+	</style>
+</head>
+<body>
+	<canvas id="myCanvas" width="1200" height="600"></canvas>
+
+	<script>
+		var c = document.getElementById("myCanvas");
+		var ctx = c.getContext("2d");
+
+		var x = c.width/2;
+		var y = c.height-30;
+		var dx = 2;
+		var dy = -2;
+		//ball
+		var ballR = 12;
+		//paddle(s)
+		var paddleHeight = 150;
+		var paddleWidth = 20;
+		var paddleY = (c.height-paddleHeight)/2 ;
+		var paddleYO = (c.height-paddleHeight)/2 ;
+		//movement
+		var upPressed = false;
+		var downPressed = false;
+		var wPressed = false;
+		var sPressed = false;
+
+		var score = 0;
+		var openScore = 0;
+
+		function drawBall () {
+			ctx.beginPath();
+			ctx.arc(x, y, ballR, 0, Math.PI*2);
+			ctx.fillStyle = "#FFF";
+			ctx.fill();
+			ctx.closePath();
+		}
+		function drawPlayer () {
+			ctx.beginPath();
+			ctx.rect(1170, paddleY, paddleWidth, paddleHeight);
+			ctx.fillStyle = "#FFF";
+			ctx.fill();
+			ctx.closePath();
+		}
+		function drawComp () {
+			ctx.beginPath();
+			ctx.rect(10, paddleYO, paddleWidth, paddleHeight);
+			ctx.fillStyle = "#FFF";
+			ctx.fill();
+			ctx.closePath();
+
+		}
+
+		document.addEventListener('keydown', keyDownHandler, false);
+		document.addEventListener('keyup', keyUpHandler, false);
+		/*document.addEventListener("keydown", keySHandler, false);
+		document.addEventListener("keyup", keyWHandler, false);*/
+
+		function keyDownHandler (e) {
+			if (e.keyCode == 40) {
+				upPressed = true;
+			}
+			else if (e.keyCode == 83) {
+				wPressed = true;
+			}
+			else if (e.keyCode == 38) {
+				downPressed =true;
+			}
+			else if (e.keyCode == 87) {
+				sPressed = true;
+			}
+		}
+		function keyUpHandler (e) {
+			if (e.keyCode == 40) {
+				upPressed = false;
+			}
+			else if (e.keyCode == 83) {
+				wPressed = false;
+			}
+			else if (e.keyCode == 38) {
+				downPressed = false;
+			}
+			else if (e.keyCode == 87) {
+				sPressed = false;
+			}
+		}
+
+		function drawScore() {
+			ctx.font = "16px Arial";
+			ctx.fillStyle = "#FFF";
+			ctx.fillText("Score: " + score, 8, 20);
+		}
+		function drawOpenScore() {
+			ctx.font = "16px Arial";
+			ctx.fillStyle = "#FFF";
+			ctx.fillText("Score: " + openScore, 1092, 20);
+		}
+
+		function getRandomArbitrary(min, max) {
+  		return (Math.random() * (max - min)) + max;
+		}
+
+		function draw() {
+			ctx.clearRect(0, 0, c.width, c.height);
+			drawBall();
+			drawPlayer();
+			drawComp();
+			drawScore();
+			drawOpenScore();
+			x += dx;
+			y += dy;
+			//ball hits left paddle
+			if(x + dx < ballR){
+				if ( y > paddleYO - ballR && y < paddleYO + paddleHeight - ballR) {
+					dx = -dx * getRandomArbitrary(0,2);
+				}
+				//if it doesn't hit left paddle
+				else{
+					openScore += 15;
+					x = c.width/2;
+   					y = c.height-30;
+    				dx = 2;
+   					dy = -2;
+    				paddleYO = (c.height-paddleHeight)/2;
+    				paddleY = (c.height-paddleHeight)/2
+					if (openScore > 45) {
+						alert("Player Two Wins");
+						openScore = 0;
+						score = 0;
+					}
+				}
+			}
+			//ball hits right paddle
+			else if(x + dx > c.width - ballR){
+				if ( y > paddleY - ballR && y < paddleY + paddleHeight - ballR){
+					dx = -dx * getRandomArbitrary(0, 2);
+				}
+				//if it doesn't hit right paddle
+				else {
+					score += 15;
+					x = c.width/2;
+   					y = c.height-30;
+    				dx = 2;
+   					dy = -2;
+    				paddleY = (c.height-paddleHeight)/2;
+    				paddleYO = (c.height-paddleHeight)/2;
+    				if (score > 45) {
+						alert("Player One Wins");
+						openScore = 0;
+						score = 0;
+					}
+				}
+			}
+			//Wall bouncing
+			if (y + dy > c.height-ballR || y + dy < ballR) {
+				dy = -dy;
+			}
+
+			//Player Movement
+			if (wPressed && paddleYO < c.height-paddleHeight) {
+				paddleYO += 7;
+				//wPressed = false;
+			}
+			else if (sPressed && paddleYO > 0) {
+				paddleYO -= 7;
+				//sPressed = false;
+			}
+
+			if (upPressed && paddleY < c.height-paddleHeight) {
+				paddleY += 7;
+			}
+			else if (downPressed && paddleY > 0) {
+				paddleY -= 7;
+			}
+			requestAnimationFrame(draw);
+		}
+		draw();
+	</script>
+</body>
+</html>
